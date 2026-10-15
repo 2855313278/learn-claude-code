@@ -59,7 +59,12 @@ def test_budget_limit_has_nonzero_exit_and_trace(tmp_path):
 )
 def test_configuration_errors_are_json_and_do_not_call_network(args):
     result = subprocess.run(
-        command(*args), check=False, cwd=ROOT, env=environment(), capture_output=True, timeout=10
+        command(*args),
+        check=False,
+        cwd=ROOT,
+        env=environment(),
+        capture_output=True,
+        timeout=10,
     )
     assert result.returncode == 2
     assert "error" in json.loads(result.stderr)
@@ -68,7 +73,12 @@ def test_configuration_errors_are_json_and_do_not_call_network(args):
 
 def test_help_is_available_without_sdk_or_keys():
     result = subprocess.run(
-        command("--help"), check=False, cwd=ROOT, env=environment(), capture_output=True, timeout=10
+        command("--help"),
+        check=False,
+        cwd=ROOT,
+        env=environment(),
+        capture_output=True,
+        timeout=10,
     )
     assert result.returncode == 0 and b"run,serve" in result.stdout
 
