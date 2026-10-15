@@ -35,6 +35,7 @@ def main():
                     *LAB_TESTS,
                     "tests/test_agents_smoke.py",
                     "tests/test_chapter_readmes.py",
+                    "tests/test_web_scenarios.py::test_generated_s16_metadata_extends_s15_without_registry_false_positives",
                 ]
             ),
             "-q",
