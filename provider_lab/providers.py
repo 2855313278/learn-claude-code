@@ -200,6 +200,8 @@ class OllamaProvider:
                 raise ValueError("response too large")
             body = json.loads(data)
             message = body["message"]
+            if not isinstance(message, dict):
+                raise ValueError("invalid message")
             calls = tuple(
                 ToolCall(
                     f"ollama-{len(messages)}-{i}",
