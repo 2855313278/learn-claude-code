@@ -158,10 +158,18 @@ def test_ollama_real_http_tool_request_and_usage(ollama_server, monkeypatch):
         b"not json",
         {"error": "secret"},
         {"message": {"content": 123}, "done": True},
+        {"message": [], "done": True},
         {"message": {"content": "partial"}, "done": False},
         b"x" * 2_000_001,
     ],
-    ids=["invalid-json", "remote-error", "invalid-text", "incomplete", "oversized"],
+    ids=[
+        "invalid-json",
+        "remote-error",
+        "invalid-text",
+        "invalid-message",
+        "incomplete",
+        "oversized",
+    ],
 )
 def test_ollama_malformed_responses_are_safe(ollama_server, reply):
     state, url = ollama_server
