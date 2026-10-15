@@ -2,7 +2,7 @@
 
 把教学 Agent Loop 扩展为支持 Claude、Ollama 与离线演示的只读仓库助手，提供统一 CLI、JSON API、调用预算和执行轨迹。
 
-[![Provider Lab](https://github.com/2855313278/agent-provider-lab/actions/workflows/provider-lab.yml/badge.svg)](https://github.com/2855313278/agent-provider-lab/actions/workflows/provider-lab.yml)
+[![Provider Lab](https://github.com/2855313278/learn-claude-code/actions/workflows/provider-lab.yml/badge.svg)](https://github.com/2855313278/learn-claude-code/actions/workflows/provider-lab.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 本项目衍生自 **[shareAI-lab/learn-claude-code](https://github.com/shareAI-lab/learn-claude-code)**，基线提交 `ce8f9f186058939da54c9d6fead78dfb5d0fd6c3`。原作者为 **shareAI Lab 及原项目贡献者**，原始 MIT License、版权声明和 Git 历史完整保留。原项目入口见 [README.upstream.md](README.upstream.md)，原中文课程说明见 [README-zh.md](README-zh.md)。新增模块由 **2855313278** 维护，使用 Codex 协助实现；本项目与上游官方无隶属关系。
@@ -21,8 +21,8 @@
 需要 Python 3.11+ 和 Git。Windows PowerShell：
 
 ```powershell
-git clone https://github.com/2855313278/agent-provider-lab.git
-cd agent-provider-lab
+git clone https://github.com/2855313278/learn-claude-code.git
+cd learn-claude-code
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lab.txt
 .\.venv\Scripts\python.exe -m provider_lab run "列出工作区文件" --provider demo --workspace .
@@ -31,8 +31,8 @@ python -m venv .venv
 Linux / macOS：
 
 ```bash
-git clone https://github.com/2855313278/agent-provider-lab.git
-cd agent-provider-lab
+git clone https://github.com/2855313278/learn-claude-code.git
+cd learn-claude-code
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lab.txt
 .venv/bin/python -m provider_lab run "List workspace files" --provider demo --workspace .
