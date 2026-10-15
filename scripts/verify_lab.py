@@ -1,4 +1,4 @@
-"""Run the lab release checks; --upstream also runs the original Linux suite."""
+"""Run lab release checks; --upstream adds the original Linux/Python 3.11 suite."""
 
 import argparse
 import subprocess
@@ -17,7 +17,9 @@ LAB_TESTS = [
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--upstream", action="store_true", help="Include all upstream tests (Linux)"
+        "--upstream",
+        action="store_true",
+        help="Include all upstream tests (upstream baseline: Linux, Python 3.11)",
     )
     args = parser.parse_args()
     paths = ["provider_lab", "scripts/verify_lab.py", *LAB_TESTS]
