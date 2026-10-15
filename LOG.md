@@ -68,8 +68,8 @@ API：仅绑定 loopback，不接受请求指定模型端点或服务器目录�
 | `tests/test_lab_cli.py` | 子进程测试中文输出、错误码、实际服务启动和健康检查 | CLI 端到端 | `python -m pytest tests/test_lab_cli.py -q`；8 通过 | 添加显式 `check=False` 并格式化；Windows 后台进程隐藏运行 |
 | `ruff-lab.toml` | 新增独立 lint/格式设置，避免继承个人机器配置 | 新代码与新测试 | `python -m ruff check --config ruff-lab.toml provider_lab tests/test_lab_providers.py tests/test_lab_runtime.py tests/test_lab_api.py tests/test_lab_cli.py`；通过 | 不重新格式化原课程代码 |
 | `requirements-lab.txt` | 固定已安装验证的 Python 包版本 | 开发/测试环境 | `python -m pip install -r requirements-lab.txt`；`python -m pip check`；通过 | 来自本机 Python 3.13 环境；跨版本安装由 CI 验证 |
-| `scripts/verify_lab.py` | 新增顺序验收入口；`--upstream` 包含完整上游测试 | 本机与 CI | `python -X utf8 scripts/verify_lab.py`；依赖/lint/格式/编译与 96 项测试通过，1 项跳过 | Windows 默认跑新模块及可移植上游检查；完整上游套件在 Linux 跑 |
-| `.github/workflows/provider-lab.yml` | 新增 Ubuntu 3.11/3.13 与 Windows 3.13 矩阵；固定 Actions SHA | 自动验收 | 用 PyYAML 校验事件、三项矩阵及只读权限；远端结果在发布节记录 | 保留原 CI 与原 Web 构建工作流 |
+| `scripts/verify_lab.py` | 新增顺序验收入口；`--upstream` 包含完整上游测试 | 本机与 CI | `python -X utf8 scripts/verify_lab.py`；依赖/lint/格式/编译与 96 项测试通过，1 项跳过 | 默认跑新模块及可移植上游检查；完整上游套件沿用 Linux / Python 3.11；不强制覆盖其编码测试的 locale |
+| `.github/workflows/provider-lab.yml` | 新增 Ubuntu 3.11/3.13 与 Windows 3.13 矩阵；固定 Actions SHA | 自动验收 | 用 PyYAML 校验事件、三项矩阵及只读权限；远端结果在发布节记录 | 完整上游回归运行于 Ubuntu 3.11，3.13 验证新模块与可移植回归；保留原 CI 与原 Web 构建工作流 |
 | `README.upstream.md` | 在重写入口前完整备份原 README | 上游课程入口与作者信息 | 比较 `git show ce8f9f1:README.md` 与备份 Git blob；逐字节相同 | 原贡献者、课程与推广链接均保留在备份中 |
 | `README.md` | 重写新架构、快速开始、模型配置、API、目录与限制 | 新项目入口 | 检查本地链接、代码围栏、出处；实际运行 CLI 与 PowerShell HTTP 示例；通过 | 在线推理未实测，明确标注；仓库 URL 按更新后的 SOP 沿用原项目名 |
 | `web/src/data/generated/versions.json` | 最后阶段用原生成器刷新过期源码快照与元数据 | 原教学网站生成索引 | `python -m pytest tests/test_web_scenarios.py::test_generated_s16_metadata_extends_s15_without_registry_false_positives -q`；1 通过 | 在独立 worktree 生成后，只同步此文件；未改课程源码 |
@@ -90,10 +90,10 @@ python -m venv .venv
 
 最后一条启动服务后，在另一个 PowerShell 窗口按 README 的 `Invoke-RestMethod` 示例访问 `/health` 和 `/v1/runs`。实际验证使用临时端口，避免占用用户的 8000 端口；已确认 `status=completed`、`steps=2`，验证后停止测试服务。
 
-Linux 完整 Python 验证：
+Linux / Python 3.11 完整 Python 验证：
 
 ```bash
-python3 -m venv .venv
+python3.11 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lab.txt
 .venv/bin/python scripts/verify_lab.py --upstream
 ```
@@ -119,6 +119,8 @@ TypeScript 检查与生产构建通过，生成 118 个静态页面。生成器�
 - Windows 原始完整测试依赖 `fcntl`、POSIX 路径/进程行为、LF 换行和 symlink 权限。相同环境下的基线比较确认失败集合相同；没有靠删除/修改上游测试来掩盖这些限制。
 - 原 Web 生成索引与最近课程源码提交不同步；使用原生成器刷新版本索引及 s07 三语文档数据，修复生成元数据检查。
 - Next.js 首次构建在本机遥测配置目录遇到 `EXDEV`；设置 `NEXT_TELEMETRY_DISABLED=1` 后构建成功，无需修改站点源码。
+- 首轮远端完整测试发现，验收脚本强制 `-X utf8` 会绕过上游 GBK 编码测试模拟的 locale；已修正为完整 pytest 使用 `-X utf8=0`，保留上游原测试，其他验收步骤继续使用 UTF-8。
+- 上游 s16 对并发线程完成事件的精确顺序有断言，Ubuntu / Python 3.13 实际执行出现顺序差异；完整上游回归沿用原工作流的 Linux / Python 3.11 基线，新模块仍同时验证 Linux / Windows 的 Python 3.13。没有修改旧实现或旧断言来使结果通过，也不宣称上游完整课程兼容 Python 3.13。
 - 没有真实云密钥与本地模型的在线验证结果；不把 demo 或协议模拟称为真实推理成功。
 
 ## 最终验证与发布
@@ -129,7 +131,32 @@ TypeScript 检查与生产构建通过，生成 118 个静态页面。生成器�
 - 相同 UTF-8 命令下，原始提交与改造分支的完整 Windows 测试均有 124 次失败，失败用例标识集合一致（121 个唯一标识，部分 unittest subtest 重复计数），新增模块没有引入上游回归。最初未启用 `-X utf8` 时为 123 次失败，差异来自上游子进程编码测试。
 - 发现上游 `web/src/data/generated/versions.json` 的源码快照未跟随最近的课程提交刷新，导致跨平台的生成元数据测试失败。在新模块与上层 CLI/API 切换完成后，使用原有生成器在独立 worktree 生成；还发现 `docs.json` 中 s07 三语快照滞后，因此将两份派生产物分别验证并分别提交；原课程实现不变。这是生成产物更新，不删除或替换旧课程实现。
 - 本地发布验收：96 通过、1 跳过；依赖、lint、格式、编译、CLI/API 示例与原 Web 生产构建均通过。完整 Windows 上游测试的既有平台限制仍存在；不将局部验收说成 Windows 全套零失败。
-- 发布目标：`https://github.com/2855313278/learn-claude-code`，public，默认分支 main；保留 refactor/auto 改造提交历史。远端创建、推送、描述/topics 与 CI 状态将在完成后记录。
+- 已发布：[2855313278/learn-claude-code](https://github.com/2855313278/learn-claude-code)，public，默认分支 main；本地保留 refactor/auto 改造分支，全部逐文件提交历史已进入 main。原远端保留为 upstream，新仓库设为 origin。
+- 已用 `gh repo edit` 设置描述：`Agent Provider Lab: a read-only Claude and Ollama agent with a unified CLI, local JSON API, execution budgets, and traceable tool calls.`；topics 为 `agent`、`anthropic`、`api`、`developer-tools`、`llm`、`ollama`、`python`。已通过 `gh repo view --json url,visibility,defaultBranchRef,description,repositoryTopics` 核对。
+- 原 LICENSE Git blob 为 `ac5ab8405e8ead1ec7a8856b1c2c9baf86006f92`，与发布版本一致；`README.upstream.md` 与原始提交的 README 逐字节相同。原作者、出处与贡献者链接均保留。
+
+### 远端最终验收（北京时间 2026-10-16）
+
+代码验收提交：`65a4f36baabafd1b4cac2a65282cd384beaa7055`。以下工作流全部成功：
+
+| 工作流 / 环境 | 实际结果 | 运行记录 |
+| --- | --- | --- |
+| Provider Lab / Ubuntu Python 3.11 | 依赖、lint、格式与编译通过；完整 Python 套件 **561 passed, 100 subtests passed** | [Provider Lab](https://github.com/2855313278/learn-claude-code/actions/runs/38768673531) |
+| Provider Lab / Ubuntu Python 3.13 | 同样的静态检查通过；新增模块及可移植回归 **97 passed** | 同上 |
+| Provider Lab / Windows Python 3.13 | 同样的静态检查通过；新增模块及可移植回归 **97 passed**；CI 可创建符号链接，本机跳过的用例也通过 | 同上 |
+| 原 Test 工作流 | Python 3.11 全套测试与 Web 生产构建通过 | [Test](https://github.com/2855313278/learn-claude-code/actions/runs/38768673483) |
+| 原 CI 工作流 | TypeScript 检查与 Web 生产构建通过 | [CI](https://github.com/2855313278/learn-claude-code/actions/runs/38768673443) |
+
+发布后最后一个提交只补充本 `LOG.md` 的发布状态、验收证据与兼容性记录，使用 `[skip ci]` 避免重复执行已完成的代码检查；相对上述验收提交仅此文档变化。文档另经 UTF-8 读取、代码围栏、本地链接、逐文件覆盖与 `git diff --check` 验证后提交。未声称原课程在 Windows / Python 3.13 上完整通过；真实 Claude / Ollama 模型推理仍未实测。
+
+核对远端的命令（需要 `gh` 已登录）：
+
+```powershell
+gh repo view 2855313278/learn-claude-code --json url,visibility,defaultBranchRef,description,repositoryTopics
+gh run list --repo 2855313278/learn-claude-code --commit 65a4f36baabafd1b4cac2a65282cd384beaa7055
+git status --short
+git ls-remote origin refs/heads/main
+```
 
 ### 一句话创新点
 
