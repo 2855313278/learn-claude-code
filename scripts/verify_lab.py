@@ -42,7 +42,10 @@ def main():
         ],
     ]
     for arguments in commands:
-        command = [sys.executable, "-X", "utf8", "-m", *arguments]
+        # Upstream tests deliberately mock the locale to exercise GBK decoding.
+        # Forced UTF-8 mode bypasses that mock inside subprocess.Popen.
+        utf8_mode = "utf8=0" if args.upstream and arguments[0] == "pytest" else "utf8"
+        command = [sys.executable, "-X", utf8_mode, "-m", *arguments]
         print("Running:", " ".join(command), flush=True)
         result = subprocess.run(command, cwd=ROOT, check=False)
         if result.returncode:
