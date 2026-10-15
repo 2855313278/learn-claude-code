@@ -144,13 +144,13 @@ web/                   # 保留的上游教学网站
 .\.venv\Scripts\python.exe -X utf8 scripts/verify_lab.py
 ```
 
-该命令依次执行依赖完整性、lint、格式、编译、新增测试及原课程编译/文档冒烟测试。Linux 运行完整上游回归：
+该命令依次执行依赖完整性、lint、格式、编译、新增测试及原课程编译/文档/生成索引检查。在 Linux 的 Python 3.11 虚拟环境运行完整上游回归：
 
 ```bash
 .venv/bin/python scripts/verify_lab.py --upstream
 ```
 
-CI 覆盖 Ubuntu Python 3.11 / 3.13 和 Windows Python 3.13。上游完整测试使用 `fcntl`、POSIX 行为及 LF 假设，原基线在本机 Windows 为 381 通过、123 失败；不将它们描述为已解决。Windows 的符号链接逃逸测试在没有创建权限时跳过，Linux CI 执行该用例。
+CI 的 Ubuntu Python 3.11 运行全部 Python 测试；Ubuntu / Windows Python 3.13 运行新增模块和可移植回归。上游完整测试使用 `fcntl`、POSIX 行为及 LF 假设，原基线在本机 Windows 为 381 通过、123 失败；不将它们描述为已解决。上游 s16 的并发事件顺序断言在 Python 3.13 出现调度差异，因此完整上游回归沿用其原 CI 的 Python 3.11 环境。Windows 的符号链接逃逸测试在没有创建权限时跳过，Linux CI 执行该用例。
 
 在线 Claude 与真实 Ollama 模型推理尚未实测；当前已验证协议合约、模拟模型响应、真实本地 HTTP 通信和离线端到端运行。精确结果和逐文件验证命令见 [LOG.md](LOG.md)。
 
